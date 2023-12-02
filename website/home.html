@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas with Background Image</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #canvas-container {
+            position: relative;
+        }
+        
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas-container">
+        <canvas id="myCanvas"></canvas>
+        <img src="BPmap.jpeg" id="background-image" style="display: none;">
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        const imageWidth = 1024;
+        const parseWidth = 100;
+        const scale = Math.floor(imageWidth / parseWidth);
+        const radius = 15;
+        const radiusWidth = radius * scale;
+
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const backgroundImage = document.getElementById('background-image');
+        // Wait for the image to load before setting canvas size
+        backgroundImage.onload = drawBackground;
+
+        var index = 0;
+
+        function drawBackground() {
+            canvas.width = backgroundImage.width;
+            canvas.height = backgroundImage.height;
+            ctx.drawImage(backgroundImage, 0, 0);
+            drawCircles(index);
+
+            ctx.font = '30px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText(coverage[index], 50, 50);
+        };
+
+        function drawDottedLine(startX, startY, endX, endY, colorIndex) {
+            // Convert the colorIndex into a color using a formula
+            const red = (colorIndex * 70) % 256 * .7;
+            const green = (colorIndex * 50) % 256 * .7;
+            const blue = (colorIndex * 30) % 256 * .7;
+
+            const color = `rgb(${red}, ${green}, ${blue})`;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 5; // Set line width to make it bolder
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.moveTo(startX, startY); // Starting point coordinates (startX, startY)
+            ctx.lineTo(endX, endY); // Ending point coordinates (endX, endY)
+            ctx.stroke();
+        }
+
+        // Function to draw circles on the canvas
+        function drawCircles(index) {
+            for (let i = 0; i < positions[index].length; i++) {
+                const x = (parseWidth - positions[index][i][1]) * scale;
+                const y = positions[index][i][0] * scale;
+                const radius = 156; //radius size
+
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(87, 187, 229, 0.55)"; // rgba(255, 165, 0, 1)
+                ctx.fill();
+                ctx.closePath();
+
+                for (let j = 1; j <= index; j++) {
+                    drawDottedLine((parseWidth - positions[j - 1][i][1]) * scale, positions[j - 1][i][0] * scale,
+                        (parseWidth - positions[j][i][1]) * scale, positions[j][i][0] * scale, i);
+                }
+            }
+        }
+
+        // Function to handle keydown events
+        function handleKeyDown(event) {
+            if (event.key === "ArrowUp" && index < positions.length - 1) {
+                index++; // Increase the variable when the up arrow key is pressed
+                console.log("Increased: " + index);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBackground();
+            } else if (event.key === "ArrowDown" && index > 0) {
+                index--; // Decrease the variable when the down arrow key is pressed
+                console.log("Decreased: " + index);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBackground();
+            }
+        }
+
+        // Event listener for keydown events
+        window.addEventListener("keydown", handleKeyDown);
+
+        backgroundImage.src = "BPmap.jpeg"; // Replace with your image path
+    </script>
+</body>
+
+</html>
