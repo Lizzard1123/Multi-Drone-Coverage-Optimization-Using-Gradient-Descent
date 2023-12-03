@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 import helpers.Coords;
 import helpers.GDOutput;
 import helpers.Pixels;
@@ -7,8 +5,11 @@ import helpers.Pixels;
 public class Main {
     public static void main(String[] args){
         int width = 100;
-        int numDrones = 10;
-        Pixels image = new Pixels(width);
+        int numDrones = 15;
+        int radius = 15;
+        String name = "BPmap5 (2).jpg";
+        Coords.setRadius(radius);
+        Pixels image = new Pixels(width, name);
         image.listInfo();
 
         //image.printImage(image.getGrid(20));
@@ -79,11 +80,12 @@ public class Main {
 
         GradientDescent gd = new GradientDescent(image);
         double stepSize = 5;
-        int epsilon = 100;
-        GDOutput output = gd.start(epsilon, numDrones, stepSize);
-        output.printHistory();
-        output.printIndividualHistory();
-        output.printChanges();
+        int iterations = 100;
+        GDOutput output = gd.start(iterations, numDrones, stepSize);
+        // output.printHistory();
+        // output.printIndividualHistory();
+        // output.printChanges();
+        output.createFile(stepSize, numDrones, Coords.radius, width, image.getSize(), name);
 
         // double[][] small = {
         //     {0.8828125,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375},

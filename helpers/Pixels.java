@@ -14,12 +14,12 @@ public class Pixels
   private double totalValue;
   public int width;
 
-  public Pixels(int width)
+  public Pixels(int width, String name)
   {
     try
     {
       // the line that reads the image file
-     image = ImageIO.read(new File("BPmap.jpeg"));
+     image = ImageIO.read(new File(name));
 
       // work with the image here ...
       this.width = width;
@@ -54,6 +54,10 @@ public class Pixels
         }
     }
     grid = grayscale;
+  }
+
+  public int getSize(){
+    return image.getWidth();
   }
 
   public void printImage(){

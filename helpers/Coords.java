@@ -4,11 +4,15 @@ public class Coords {
     //in
     private int x;
     private int y;
-    public int radius = 15;
+    public static int radius = 0;
 
     public Coords(int x, int y){
         this.x = x;
         this.y = y;
+    }
+
+    public static void setRadius(int newRadius){
+        radius = newRadius;
     }
 
     public int getX(){

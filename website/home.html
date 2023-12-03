@@ -22,6 +22,7 @@
             border: 1px solid #000;
         }
     </style>
+    <script src="output.js"></script>
 </head>
 
 <body>
@@ -29,20 +30,18 @@
         <canvas id="myCanvas"></canvas>
         <img src="BPmap.jpeg" id="background-image" style="display: none;">
     </div>
-    <script src="scripts.js"></script>
-    <script src="coverage.js"></script>
-    <script src="history.js"></script>
     <script>
-        const imageWidth = 1024;
-        const parseWidth = 100;
+        const imageWidth = globalData.imageSize;
+        const parseWidth = globalData.width;
         const scale = Math.floor(imageWidth / parseWidth);
-        const radius = 15;
+        const radius = globalData.radius;
         const radiusWidth = radius * scale;
 
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
 
         const backgroundImage = document.getElementById('background-image');
+        backgroundImage.src = globalData.imageName; // Replace with your image path
         // Wait for the image to load before setting canvas size
         backgroundImage.onload = drawBackground;
 
@@ -56,7 +55,7 @@
 
             ctx.font = '20px Arial';
             ctx.fillStyle = 'black';
-            ctx.fillText(coverage[index], 50, 50);
+            ctx.fillText(globalData.coverage[index], 50, 50);
         };
 
         function drawDottedLine(startX, startY, endX, endY, colorIndex) {
@@ -78,9 +77,9 @@
 
         // Function to draw circles on the canvas
         function drawCircles(index) {
-            for (let i = 0; i < positions[index].length; i++) {
-                const x = (positions[index][i][1]) * scale;
-                const y = positions[index][i][0] * scale;
+            for (let i = 0; i < globalData.positions[index].length; i++) {
+                const x = (globalData.positions[index][i][1]) * scale;
+                const y = globalData.positions[index][i][0] * scale;
 
                 ctx.beginPath();
                 ctx.arc(x, y, radiusWidth, 0, Math.PI * 2);
@@ -89,18 +88,18 @@
                 ctx.closePath();
                 ctx.font = '15px Arial';
                 ctx.fillStyle = 'black';
-                ctx.fillText(individualHistory[index][i], x - radiusWidth / 2, y + 20);
+                ctx.fillText(globalData.individualHistory[index][i], x - radiusWidth / 2, y + 20);
 
                 for (let j = 1; j <= index; j++) {
-                    drawDottedLine((positions[j - 1][i][1]) * scale, positions[j - 1][i][0] * scale,
-                        (positions[j][i][1]) * scale, positions[j][i][0] * scale, i);
+                    drawDottedLine((globalData.positions[j - 1][i][1]) * scale, globalData.positions[j - 1][i][0] * scale,
+                        (globalData.positions[j][i][1]) * scale, globalData.positions[j][i][0] * scale, i);
                 }
             }
         }
 
         // Function to handle keydown events
         function handleKeyDown(event) {
-            if (event.key === "ArrowUp" && index < positions.length - 1) {
+            if (event.key === "ArrowUp" && index < globalData.positions.length - 1) {
                 index++; // Increase the variable when the up arrow key is pressed
                 console.log("Increased: " + index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -115,8 +114,6 @@
 
         // Event listener for keydown events
         window.addEventListener("keydown", handleKeyDown);
-
-        backgroundImage.src = "BPmap.jpeg"; // Replace with your image path
     </script>
 </body>
 
