@@ -6,8 +6,8 @@ public class Main {
     public static void main(String[] args){
         int width = 100;
         int numDrones = 15;
-        int radius = 15;
-        String name = "BPmap5 (2).jpg";
+        int radius = 10;
+        String name = "./frames/frame_100_delay-0.04s.jpg";
         Coords.setRadius(radius);
         Pixels image = new Pixels(width, name);
         image.listInfo();
