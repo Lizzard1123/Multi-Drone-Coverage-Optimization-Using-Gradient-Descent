@@ -4,14 +4,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class GDOutput {
-    private Coords[][] coords;
-    private double[] coverageOverTime;
-    private double[][] individualHistory;
+    public Coords[][] coords;
+    public double[] coverageOverTime;
+    public double[][] individualHistory;
+    public String name;
 
-    public GDOutput(Coords[][] coords, double[] coverageOverTime, double[][] individualHistory){
+    public GDOutput(Coords[][] coords, double[] coverageOverTime, double[][] individualHistory, String name){
         this.coords = coords;
         this.coverageOverTime = coverageOverTime;
         this.individualHistory = individualHistory;
+        this.name = name;
     }
 
     public Coords[][] getCoords(){
@@ -88,6 +90,7 @@ public class GDOutput {
         // JSON string construction
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("const globalData = ");
+        jsonBuilder.append("[");
         jsonBuilder.append("{");
         //variables
         //stepSize, numDrones, Coords.radius ,stepSize, width, image.getSize()
@@ -145,7 +148,7 @@ public class GDOutput {
         }
         jsonBuilder.append("]");
         jsonBuilder.append("}");
-
+        jsonBuilder.append("]");
         // Writing JSON to a file
         try (FileWriter fileWriter = new FileWriter("./website/output.js")) {
             fileWriter.write(jsonBuilder.toString());

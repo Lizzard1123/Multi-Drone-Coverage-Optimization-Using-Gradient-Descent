@@ -31,38 +31,42 @@
         <img src="BPmap.jpeg" id="background-image" style="display: none;">
     </div>
     <script>
-        const imageWidth = globalData.imageSize;
-        const parseWidth = globalData.width;
+        var gif_index = 0;
+        const imageWidth = globalData[gif_index].imageSize;
+        const parseWidth = globalData[gif_index].width;
         const scale = Math.floor(imageWidth / parseWidth);
-        const radius = globalData.radius;
+        const radius = globalData[gif_index].radius;
         const radiusWidth = radius * scale;
 
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
 
         const backgroundImage = document.getElementById('background-image');
-        backgroundImage.src = globalData.imageName; // Replace with your image path
+        backgroundImage.src = globalData[gif_index].imageName; // Replace with your image path
         // Wait for the image to load before setting canvas size
         backgroundImage.onload = drawBackground;
 
-        var index = 0;
+        var current_index = 0;
 
         function drawBackground() {
+            backgroundImage.src = globalData[gif_index].imageName;
             canvas.width = backgroundImage.width;
             canvas.height = backgroundImage.height;
             ctx.drawImage(backgroundImage, 0, 0);
-            drawCircles(index);
 
+            drawCircles(current_index);
             ctx.font = '20px Arial';
             ctx.fillStyle = 'black';
-            ctx.fillText(globalData.coverage[index], 50, 50);
+
+            ctx.fillText(globalData[gif_index].coverage[current_index], 50, 50);
+            ctx.fillText(globalData[gif_index].imageName, 50, 30);
         };
 
-        function drawDottedLine(startX, startY, endX, endY, colorIndex) {
-            // Convert the colorIndex into a color using a formula
-            const red = (colorIndex * 70) % 256 * .7;
-            const green = (colorIndex * 50) % 256 * .7;
-            const blue = (colorIndex * 30) % 256 * .7;
+        function drawDottedLine(startX, startY, endX, endY, colorcurrent_index) {
+            // Convert the colorcurrent_index into a color using a formula
+            const red = (colorcurrent_index * 70) % 256 * .7;
+            const green = (colorcurrent_index * 50) % 256 * .7;
+            const blue = (colorcurrent_index * 30) % 256 * .7;
 
             const color = `rgb(${red}, ${green}, ${blue})`;
 
@@ -76,10 +80,10 @@
         }
 
         // Function to draw circles on the canvas
-        function drawCircles(index) {
-            for (let i = 0; i < globalData.positions[index].length; i++) {
-                const x = (globalData.positions[index][i][1]) * scale;
-                const y = globalData.positions[index][i][0] * scale;
+        function drawCircles(current_index) {
+            for (let i = 0; i < globalData[gif_index].positions[current_index].length; i++) {
+                const x = (globalData[gif_index].positions[current_index][i][1]) * scale;
+                const y = globalData[gif_index].positions[current_index][i][0] * scale;
 
                 ctx.beginPath();
                 ctx.arc(x, y, radiusWidth, 0, Math.PI * 2);
@@ -88,25 +92,42 @@
                 ctx.closePath();
                 ctx.font = '15px Arial';
                 ctx.fillStyle = 'black';
-                ctx.fillText(globalData.individualHistory[index][i], x - radiusWidth / 2, y + 20);
+                ctx.fillText(globalData[gif_index].individualHistory[current_index][i], x - radiusWidth / 2, y + 20);
 
-                for (let j = 1; j <= index; j++) {
-                    drawDottedLine((globalData.positions[j - 1][i][1]) * scale, globalData.positions[j - 1][i][0] * scale,
-                        (globalData.positions[j][i][1]) * scale, globalData.positions[j][i][0] * scale, i);
+                for (let j = 1; j <= current_index; j++) {
+                    drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
+                        (globalData[gif_index].positions[j][i][1]) * scale, globalData[gif_index].positions[j][i][0] * scale, i);
                 }
             }
         }
 
         // Function to handle keydown events
         function handleKeyDown(event) {
-            if (event.key === "ArrowUp" && index < globalData.positions.length - 1) {
-                index++; // Increase the variable when the up arrow key is pressed
-                console.log("Increased: " + index);
+            if (event.key === "ArrowUp") {
+                if (current_index < globalData[gif_index].positions.length - 1) {
+                    current_index++; // Increase the variable when the up arrow key is pressed
+                } else {
+                    current_index = 0;
+                }
+                console.log("Increased: " + current_index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
-            } else if (event.key === "ArrowDown" && index > 0) {
-                index--; // Decrease the variable when the down arrow key is pressed
-                console.log("Decreased: " + index);
+            } else if (event.key === "ArrowDown" && current_index > 0) {
+                current_index--; // Decrease the variable when the down arrow key is pressed
+                console.log("Decreased: " + current_index);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBackground();
+            }
+            if (event.key === "ArrowRight" && gif_index < globalData.length - 1) {
+                gif_index++; // Increase the variable when the up arrow key is pressed
+                current_index = globalData[gif_index].coverage.length - 1;
+                console.log("Frame Increased: " + gif_index);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBackground();
+            } else if (event.key === "ArrowLeft" && gif_index > 0) {
+                gif_index--; // Decrease the variable when the down arrow key is pressed
+                current_index = globalData[gif_index].coverage.length - 1;
+                console.log("Frame Decreased: " + gif_index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
             }

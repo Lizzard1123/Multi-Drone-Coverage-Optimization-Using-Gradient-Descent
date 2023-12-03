@@ -13,13 +13,15 @@ public class Pixels
   private double[][] grid;
   private double totalValue;
   public int width;
+  private String name;
 
   public Pixels(int width, String name)
   {
     try
     {
       // the line that reads the image file
-     image = ImageIO.read(new File(name));
+      this.name = name;
+      image = ImageIO.read(new File(name));
 
       // work with the image here ...
       this.width = width;
@@ -58,6 +60,10 @@ public class Pixels
 
   public int getSize(){
     return image.getWidth();
+  }
+
+  public String getName(){
+    return name;
   }
 
   public void printImage(){

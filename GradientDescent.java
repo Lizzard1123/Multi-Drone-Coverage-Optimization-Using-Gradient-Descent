@@ -1,6 +1,7 @@
 import java.util.Arrays;
 
 import helpers.Coords;
+import helpers.GDGifOutput;
 import helpers.GDOutput;
 import helpers.Pixels;
 import helpers.PreciseCoords;
@@ -62,6 +63,29 @@ public class GradientDescent {
         Coords[] locations = image.randomPositions(numDrones);
         double[] coverageOverTime = new double[iterations];
         for(int i = 0; i < iterations; i++){
+            if(i == iterations - 1){
+                //pick best performer and put it at the end
+                int bestIndex = 0;
+                double bestCoverage = coverageOverTime[bestIndex];
+                for(int j = 1; j < coverageOverTime.length - 1; j++){
+                    if(coverageOverTime[j] >= bestCoverage){
+                        bestCoverage = coverageOverTime[j];
+                        bestIndex = j;
+                    }
+                }
+                //update arrays
+                for(int j = 0; j < numDrones; j++){
+                    history[i][j] = new Coords(history[bestIndex][j].getX(), history[bestIndex][j].getY());
+                }
+                for(int j = 0; j < numDrones; j++){
+                    individualHistory[i][j] = individualHistory[bestIndex][j];
+                }
+                for(int j = 0; j < numDrones; j++){
+                    locations[j] = new Coords(history[bestIndex][j].getX(), history[bestIndex][j].getY());
+                }
+                coverageOverTime[i] = bestCoverage;
+                continue;
+            }
             for(int k = 0; k < locations.length; k++){
                 Coords[] onlyOneDrone = {locations[k]};
                 double onlyOneCoverage = image.coverage(onlyOneDrone);
@@ -106,6 +130,27 @@ public class GradientDescent {
                 history[i][k] = new Coords(locations[k].getX(), locations[k].getY());
             }
         }
-        return new GDOutput(history, coverageOverTime, individualHistory);
+        return new GDOutput(history, coverageOverTime, individualHistory, image.getName());
+    }
+
+    public GDGifOutput start(int frames, int iterations, int numDrones, double stepSize){
+        GDOutput[] outputs = new GDOutput[frames];
+        for(int i = 0; i < frames; i++){
+            //make new image
+            String newIndex = "";
+            int num = i;
+            if(num < 100){
+                newIndex += "0";
+            }
+            if(num < 10){
+                newIndex += "0";
+            }
+            newIndex += num;
+            String newString = "./frames/frame_" + newIndex + "_delay-0.04s.jpg";
+            Pixels newImage = new Pixels(image.width, newString);
+            this.image = newImage;
+            outputs[i] = start(iterations, numDrones, stepSize);
+        }
+        return new GDGifOutput(outputs);
     }
 }

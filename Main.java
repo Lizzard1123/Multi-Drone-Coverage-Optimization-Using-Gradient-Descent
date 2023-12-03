@@ -1,4 +1,5 @@
 import helpers.Coords;
+import helpers.GDGifOutput;
 import helpers.GDOutput;
 import helpers.Pixels;
 
@@ -7,7 +8,8 @@ public class Main {
         int width = 100;
         int numDrones = 15;
         int radius = 10;
-        String name = "./frames/frame_100_delay-0.04s.jpg";
+        int frames = 256;
+        String name = "./frames/frame_000_delay-0.04s.jpg";
         Coords.setRadius(radius);
         Pixels image = new Pixels(width, name);
         image.listInfo();
@@ -81,11 +83,12 @@ public class Main {
         GradientDescent gd = new GradientDescent(image);
         double stepSize = 5;
         int iterations = 100;
-        GDOutput output = gd.start(iterations, numDrones, stepSize);
+        //GDOutput output = gd.start(iterations, numDrones, stepSize);
+        GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize);
         // output.printHistory();
         // output.printIndividualHistory();
         // output.printChanges();
-        output.createFile(stepSize, numDrones, Coords.radius, width, image.getSize(), name);
+        output.createFile(stepSize, numDrones, Coords.radius, width, image.getSize());
 
         // double[][] small = {
         //     {0.8828125,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375,0.99609375},
