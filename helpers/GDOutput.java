@@ -3,10 +3,12 @@ package helpers;
 public class GDOutput {
     private Coords[][] coords;
     private double[] coverageOverTime;
+    private double[][] individualHistory;
 
-    public GDOutput(Coords[][] coords, double[] coverageOverTime){
+    public GDOutput(Coords[][] coords, double[] coverageOverTime, double[][] individualHistory){
         this.coords = coords;
         this.coverageOverTime = coverageOverTime;
+        this.individualHistory = individualHistory;
     }
 
     public Coords[][] getCoords(){
@@ -41,6 +43,29 @@ public class GDOutput {
             System.out.println("[");
             for(int i = 0; i < coords[k].length; i++){
                 System.out.print("[" + coords[k][i].getX() + ", " + coords[k][i].getY() + "]");
+                if(i != coords[k].length - 1){
+                    System.out.print(",");
+                }
+                System.out.println();
+            }
+            System.out.print("]");
+            if(k != coords.length - 1){
+                System.out.println(",");
+            } else {
+                System.out.println();
+            }
+        }
+        System.out.print("]");
+    }
+
+    public void printIndividualHistory(){
+        System.out.println("------- INDIVIDUAL HISTORY -------");
+        System.out.println("[");
+        for(int k = 0; k < coords.length; k++){
+            //for each location coordinates, print it out
+            System.out.println("[");
+            for(int i = 0; i < coords[k].length; i++){
+                System.out.print("[" + individualHistory[k][i] + "]");
                 if(i != coords[k].length - 1){
                     System.out.print(",");
                 }

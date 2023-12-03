@@ -30,6 +30,8 @@
         <img src="BPmap.jpeg" id="background-image" style="display: none;">
     </div>
     <script src="scripts.js"></script>
+    <script src="coverage.js"></script>
+    <script src="history.js"></script>
     <script>
         const imageWidth = 1024;
         const parseWidth = 100;
@@ -52,7 +54,7 @@
             ctx.drawImage(backgroundImage, 0, 0);
             drawCircles(index);
 
-            ctx.font = '30px Arial';
+            ctx.font = '20px Arial';
             ctx.fillStyle = 'black';
             ctx.fillText(coverage[index], 50, 50);
         };
@@ -77,19 +79,21 @@
         // Function to draw circles on the canvas
         function drawCircles(index) {
             for (let i = 0; i < positions[index].length; i++) {
-                const x = (parseWidth - positions[index][i][1]) * scale;
+                const x = (positions[index][i][1]) * scale;
                 const y = positions[index][i][0] * scale;
-                const radius = 156; //radius size
 
                 ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.arc(x, y, radiusWidth, 0, Math.PI * 2);
                 ctx.fillStyle = "rgba(87, 187, 229, 0.55)"; // rgba(255, 165, 0, 1)
                 ctx.fill();
                 ctx.closePath();
+                ctx.font = '15px Arial';
+                ctx.fillStyle = 'black';
+                ctx.fillText(individualHistory[index][i], x - radiusWidth / 2, y + 20);
 
                 for (let j = 1; j <= index; j++) {
-                    drawDottedLine((parseWidth - positions[j - 1][i][1]) * scale, positions[j - 1][i][0] * scale,
-                        (parseWidth - positions[j][i][1]) * scale, positions[j][i][0] * scale, i);
+                    drawDottedLine((positions[j - 1][i][1]) * scale, positions[j - 1][i][0] * scale,
+                        (positions[j][i][1]) * scale, positions[j][i][0] * scale, i);
                 }
             }
         }

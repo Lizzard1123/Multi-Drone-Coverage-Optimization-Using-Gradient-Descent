@@ -48,9 +48,9 @@ public class Pixels
             int blue = color & 0xff;
             int green = (color & 0xff00) >> 8;
             int red = (color & 0xff0000) >> 16;
-            double grey = (double) (blue + green + red) / (3 * 226);
-            grayscale[j][i] = grey;
-            totalValue += grey;
+            double grey = (double) (blue + green + red) / (3 * 256);
+            grayscale[j][i] = 1- grey;
+            totalValue += 1 - grey;
         }
     }
     grid = grayscale;
@@ -134,7 +134,7 @@ public class Pixels
     }
     //add up hashmap
     double droneCovered = 0;
-    for(Double val : covered.values()){
+    for(double val : covered.values()){
       droneCovered += val;
       //System.out.println("Value covered: " + val);
     }
