@@ -14,6 +14,7 @@ public class Pixels
   private double totalValue;
   public int width;
   private String name;
+  private double noiseWeight = 0.5;
 
   public Pixels(int width, String name)
   {
@@ -155,6 +156,18 @@ public class Pixels
     Coords[] points = new Coords[n];
     for(int i = 0; i < n; i++){
       points[i] = new Coords((int)Math.round((Math.random() * width)), (int)Math.round((Math.random() * width)));
+    }
+    return points;
+  }
+
+  public Coords[] warmStart(Coords[] prev){
+    Coords[] points = new Coords[prev.length];
+    for(int i = 0; i < prev.length; i++){
+      double averageX = (((Math.random() * width) * noiseWeight) + (prev[i].getX() * (1 - noiseWeight)));
+      double averageY = (((Math.random() * width) * noiseWeight) + (prev[i].getY() * (1 - noiseWeight)));
+      int newX = (int)Math.round(averageX);
+      int newY = (int)Math.round(averageY);
+      points[i] = new Coords(newX, newY);
     }
     return points;
   }

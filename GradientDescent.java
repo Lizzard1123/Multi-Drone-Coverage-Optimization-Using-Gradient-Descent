@@ -56,11 +56,16 @@ public class GradientDescent {
         System.out.print("]");
     }
 
-    public GDOutput start(int iterations, int numDrones, double stepSize){
+    public GDOutput start(int iterations, int numDrones, double stepSize, Coords[] prev){
         //start in random locations
         Coords[][] history = new Coords[iterations][numDrones];
         double[][] individualHistory = new double[iterations][numDrones];
-        Coords[] locations = image.randomPositions(numDrones);
+        Coords[] locations;
+        if(prev == null){
+            locations = image.randomPositions(numDrones);
+        } else {
+            locations = image.warmStart(prev);
+        }
         double[] coverageOverTime = new double[iterations];
         for(int i = 0; i < iterations; i++){
             if(i == iterations - 1){
@@ -133,6 +138,11 @@ public class GradientDescent {
         return new GDOutput(history, coverageOverTime, individualHistory, image.getName());
     }
 
+    public GDOutput start(int iterations, int numDrones, double stepSize){
+        return start(iterations, numDrones, stepSize, null);
+    }
+
+
     public GDGifOutput start(int frames, int iterations, int numDrones, double stepSize){
         GDOutput[] outputs = new GDOutput[frames];
         for(int i = 0; i < frames; i++){
@@ -149,7 +159,12 @@ public class GradientDescent {
             String newString = "./frames/frame_" + newIndex + "_delay-0.04s.jpg";
             Pixels newImage = new Pixels(image.width, newString);
             this.image = newImage;
-            outputs[i] = start(iterations, numDrones, stepSize);
+
+            if(i == 0){
+                outputs[i] = start(iterations, numDrones, stepSize);
+            } else {
+                outputs[i] = start(iterations, numDrones, stepSize, outputs[i - 1].getBestCoords());
+            }
         }
         return new GDGifOutput(outputs);
     }

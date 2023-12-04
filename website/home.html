@@ -102,7 +102,7 @@
                 ctx.closePath();
                 ctx.font = '15px Arial';
                 ctx.fillStyle = 'black';
-                ctx.fillText(globalData[gif_index].individualHistory[current_index][i], x - radiusWidth / 2, y + 20);
+                ctx.fillText(globalData[gif_index].individualHistory[current_index][i], x - radiusWidth / 1.5, y + 20);
 
                 for (let j = 1; j <= current_index; j++) {
                     //drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
@@ -195,7 +195,7 @@
                 ctx.closePath();
                 ctx.font = '15px Arial';
                 ctx.fillStyle = 'black';
-                ctx.fillText("Drone " + i, x - radiusWidth / 8, y + 20);
+                ctx.fillText("Drone " + i, x - radiusWidth / 4, y - 20);
 
                 // for (let j = 1; j <= current_index; j++) {
                 //     drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
@@ -210,7 +210,7 @@
             }
         }
 
-        const moveSize = 0.5;
+        const moveSize = 0.2;
 
         function moveDroneTowardsTarget(i) {
             // Calculate the distance between current and target positions
