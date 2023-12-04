@@ -23,6 +23,7 @@
         }
     </style>
     <script src="output.js"></script>
+    <script src="hungarian.js"></script>
 </head>
 
 <body>
@@ -47,6 +48,7 @@
         backgroundImage.onload = drawBackground;
 
         var current_index = 0;
+        var runOnce = false;
 
         function drawBackground() {
             backgroundImage.src = globalData[gif_index].imageName;
@@ -60,6 +62,14 @@
 
             ctx.fillText(globalData[gif_index].coverage[current_index], 50, 50);
             ctx.fillText(globalData[gif_index].imageName, 50, 30);
+
+            //drones
+            //drawDrones();
+            if (!runOnce) {
+                runOnce = true;
+                // Start the animation
+                animate();
+            }
         };
 
         function drawDottedLine(startX, startY, endX, endY, colorcurrent_index) {
@@ -95,8 +105,8 @@
                 ctx.fillText(globalData[gif_index].individualHistory[current_index][i], x - radiusWidth / 2, y + 20);
 
                 for (let j = 1; j <= current_index; j++) {
-                    drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
-                        (globalData[gif_index].positions[j][i][1]) * scale, globalData[gif_index].positions[j][i][0] * scale, i);
+                    //drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
+                    //(globalData[gif_index].positions[j][i][1]) * scale, globalData[gif_index].positions[j][i][0] * scale, i);
                 }
             }
         }
@@ -112,8 +122,12 @@
                 console.log("Increased: " + current_index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
-            } else if (event.key === "ArrowDown" && current_index > 0) {
-                current_index--; // Decrease the variable when the down arrow key is pressed
+            } else if (event.key === "ArrowDown") {
+                if (current_index > 0) {
+                    current_index--; // Increase the variable when the up arrow key is pressed
+                } else {
+                    current_index = globalData[gif_index].positions.length - 1;
+                }
                 console.log("Decreased: " + current_index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
@@ -131,6 +145,103 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
             }
+        }
+
+        // hungarian
+        const droneLocations = [];
+
+        function randomLocations(n) {
+            for (let i = 0; i < n; i++) {
+                let coord = [];
+                coord.push(Math.floor(Math.random() * globalData[gif_index].width), Math.floor(Math.random() * globalData[gif_index].width));
+                droneLocations.push(coord);
+            }
+        }
+
+        // let n = 3;
+        // let Arr = [1500, 4000, 4500, 2000, 6000, 3500, 2000, 4000, 2500];
+        let n = globalData[0].numDrones;
+        randomLocations(n);
+        let optimalPos = globalData[gif_index].positions[current_index];
+
+
+        let optimals = [];
+
+
+        // Function to draw circles on the canvas
+        function drawDrones() {
+            let weights = [];
+            //let lastIndex = globalData[gif_index].positions.length - 1;
+
+            for (let drones = 0; drones < n; drones++) {
+                for (let holeIndex = 0; holeIndex < n; holeIndex++) {
+                    let xDiff = globalData[gif_index].positions[current_index][holeIndex][1] - droneLocations[drones][0];
+                    let yDiff = globalData[gif_index].positions[current_index][holeIndex][0] - droneLocations[drones][1];
+                    let thisWeight = Math.pow(xDiff, 2) + Math.pow(yDiff, 2);
+                    weights.push(thisWeight);
+                }
+            }
+            let ob = new Solution();
+            let answer = ob.assignmentProblem(weights, n)[0];
+            optimals = ob.assignmentProblem(weights, n)[1];
+            for (let i = 0; i < droneLocations.length; i++) {
+                const x = droneLocations[i][0] * scale;
+                const y = droneLocations[i][1] * scale;
+
+                ctx.beginPath();
+                ctx.arc(x, y, radiusWidth, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(23, 122, 6, 0.61)"; // rgba(255, 165, 0, 1)
+                ctx.fill();
+                ctx.closePath();
+                ctx.font = '15px Arial';
+                ctx.fillStyle = 'black';
+                ctx.fillText("Drone " + i, x - radiusWidth / 8, y + 20);
+
+                // for (let j = 1; j <= current_index; j++) {
+                //     drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
+                //         (globalData[gif_index].positions[j][i][1]) * scale, globalData[gif_index].positions[j][i][0] * scale, i);
+                // }
+                drawDottedLine(x, y, globalData[gif_index].positions[current_index][optimals[i]][1] * scale,
+                    globalData[gif_index].positions[current_index][optimals[i]][0] * scale, i);
+                ctx.font = '20px Arial';
+                ctx.fillStyle = 'black';
+
+                ctx.fillText("Travel: " + -1 * answer, 50, 70);
+            }
+        }
+
+        const moveSize = 0.5;
+
+        function moveDroneTowardsTarget(i) {
+            // Calculate the distance between current and target positions
+            let xDiff = globalData[gif_index].positions[current_index][optimals[i]][1] - droneLocations[i][0];
+            let yDiff = globalData[gif_index].positions[current_index][optimals[i]][0] - droneLocations[i][1];
+            const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+
+            // Move the drone if it's not at the target position yet
+            if (distance > moveSize) {
+                // Calculate the normalized direction towards the target
+                const directionX = xDiff / distance;
+                const directionY = yDiff / distance;
+
+                // Move the drone towards the target by step size
+                droneLocations[i][0] += directionX * moveSize;
+                droneLocations[i][1] += directionY * moveSize;
+            } else {
+                // Drone reached the target, stop moving
+                droneLocations[i][0] = globalData[gif_index].positions[current_index][optimals[i]][1];
+                droneLocations[i][1] = globalData[gif_index].positions[current_index][optimals[i]][0];
+            }
+        }
+
+        function animate() {
+            drawDrones();
+            for (let i = 0; i < n; i++) {
+                moveDroneTowardsTarget(i);
+            }
+
+            // Request next animation frame
+            requestAnimationFrame(animate);
         }
 
         // Event listener for keydown events
