@@ -202,14 +202,22 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
             }
-            if (event.key === "ArrowRight" && gif_index < globalData.length - 1) {
-                gif_index++; // Increase the variable when the up arrow key is pressed
+            if (event.key === "ArrowRight") {
+                if (gif_index < globalData.length - 1) {
+                    gif_index++; // Increase the variable when the up arrow key is pressed
+                } else {
+                    gif_index = 0;
+                }
                 current_index = globalData[gif_index].coverage.length - 1;
                 console.log("Frame Increased: " + gif_index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
-            } else if (event.key === "ArrowLeft" && gif_index > 0) {
-                gif_index--; // Decrease the variable when the down arrow key is pressed
+            } else if (event.key === "ArrowLeft") {
+                if (gif_index > 0) {
+                    gif_index--; // Increase the variable when the up arrow key is pressed
+                } else {
+                    gif_index = globalData.length - 1;
+                }
                 current_index = globalData[gif_index].coverage.length - 1;
                 console.log("Frame Decreased: " + gif_index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
