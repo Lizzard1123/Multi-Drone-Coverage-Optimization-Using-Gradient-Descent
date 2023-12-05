@@ -7,7 +7,7 @@ import helpers.Pixels;
 import helpers.PreciseCoords;
 
 public class GradientDescent {
-    private Pixels image;
+    public Pixels image;
     private int popNumber = 5;
     private double popBar = 0.70;
 
@@ -143,7 +143,7 @@ public class GradientDescent {
     }
 
 
-    public GDGifOutput start(int frames, int iterations, int numDrones, double stepSize){
+    public GDGifOutput start(int frames, int iterations, int numDrones, double stepSize, boolean warm){
         GDOutput[] outputs = new GDOutput[frames];
         for(int i = 0; i < frames; i++){
             //make new image
@@ -160,12 +160,22 @@ public class GradientDescent {
             Pixels newImage = new Pixels(image.width, newString);
             this.image = newImage;
 
-            if(i == 0){
+            if(i == 0 || !warm){
                 outputs[i] = start(iterations, numDrones, stepSize);
             } else {
                 outputs[i] = start(iterations, numDrones, stepSize, outputs[i - 1].getBestCoords());
             }
         }
+        return new GDGifOutput(outputs);
+    }
+
+    public GDGifOutput start(int frames, int iterations, int numDrones, double stepSize){
+        return start(frames, iterations, numDrones, stepSize, false);
+    }
+
+    public GDGifOutput startThreads(int threads, int frames, int iterations, int numDrones, double stepSize){
+        ThreadHandler threadHandler = new ThreadHandler(threads);
+        GDOutput[] outputs = threadHandler.start(iterations, numDrones, stepSize, frames, image);
         return new GDGifOutput(outputs);
     }
 }

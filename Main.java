@@ -83,8 +83,10 @@ public class Main {
         GradientDescent gd = new GradientDescent(image);
         double stepSize = 5;
         int iterations = 100;
+        int processes = 16;
         //GDOutput output = gd.start(iterations, numDrones, stepSize);
-        GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize);
+        // GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize);
+        GDGifOutput output = gd.startThreads(processes, frames, iterations, numDrones, stepSize);
         output.createFile(stepSize, numDrones, Coords.radius, width, image.getSize());
 
     }
