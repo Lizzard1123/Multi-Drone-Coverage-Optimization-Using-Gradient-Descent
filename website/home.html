@@ -21,12 +21,76 @@
         canvas {
             border: 1px solid #000;
         }
+        
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            justify-content: center;
+            height: 100vh;
+        }
+        
+        .input-container {
+            margin: 10px;
+        }
+        /* Styling for the checkboxes */
+        
+        .fancy-checkbox {
+            display: none;
+        }
+        
+        .fancy-checkbox+label:before {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000;
+            margin-right: 5px;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+        
+        .fancy-checkbox:checked+label:before {
+            background-color: #000;
+        }
+        /* Optional styling for the labels */
+        
+        label {
+            font-family: Arial, sans-serif;
+        }
     </style>
     <script src="output.js"></script>
     <script src="hungarian.js"></script>
 </head>
 
 <body>
+    <div id="container">
+        <div class="input-container">
+            <input type="checkbox" class="fancy-checkbox" id="checkbox0" checked>
+            <label for="checkbox0">Draw Drones</label>
+        </div>
+        <div class="input-container">
+            <input type="checkbox" class="fancy-checkbox" id="checkbox1" checked>
+            <label for="checkbox1">Draw Drone Directions</label>
+        </div>
+        <div class="input-container">
+            <input type="checkbox" class="fancy-checkbox" id="checkbox2" checked>
+            <label for="checkbox2">Disable History</label>
+        </div>
+        <div class="input-container">
+            <input type="checkbox" class="fancy-checkbox" id="checkbox3" checked>
+            <label for="checkbox3">Draw Optimal Locations</label>
+        </div>
+        <div class="input-container">
+            <input type="checkbox" class="fancy-checkbox" id="checkbox4">
+            <label for="checkbox4">Draw Gradient Descent</label>
+        </div>
+        <div class="input-container">
+            <input type="checkbox" class="fancy-checkbox" id="checkbox5">
+            <label for="checkbox5">Animate</label>
+        </div>
+    </div>
+
     <div id="canvas-container">
         <canvas id="myCanvas"></canvas>
         <img src="BPmap.jpeg" id="background-image" style="display: none;">
@@ -47,7 +111,7 @@
         // Wait for the image to load before setting canvas size
         backgroundImage.onload = drawBackground;
 
-        var current_index = 0;
+        var current_index = globalData[gif_index].coverage.length - 1;
         var runOnce = false;
 
         function drawBackground() {
@@ -56,12 +120,16 @@
             canvas.height = backgroundImage.height;
             ctx.drawImage(backgroundImage, 0, 0);
 
-            drawCircles(current_index);
+            if (checkCheckboxByIndex(3)) {
+                drawCircles(current_index);
+            }
+
             ctx.font = '20px Arial';
             ctx.fillStyle = 'black';
 
             ctx.fillText(globalData[gif_index].coverage[current_index], 50, 50);
             ctx.fillText(globalData[gif_index].imageName, 50, 30);
+            ctx.fillText(current_index, 10, 30);
 
             //drones
             //drawDrones();
@@ -104,16 +172,18 @@
                 ctx.fillStyle = 'black';
                 ctx.fillText(globalData[gif_index].individualHistory[current_index][i], x - radiusWidth / 1.5, y + 20);
 
-                for (let j = 1; j <= current_index; j++) {
-                    //drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
-                    //(globalData[gif_index].positions[j][i][1]) * scale, globalData[gif_index].positions[j][i][0] * scale, i);
+                if (checkCheckboxByIndex(4)) {
+                    for (let j = 1; j <= current_index; j++) {
+                        drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
+                            (globalData[gif_index].positions[j][i][1]) * scale, globalData[gif_index].positions[j][i][0] * scale, i);
+                    }
                 }
             }
         }
 
         // Function to handle keydown events
         function handleKeyDown(event) {
-            if (event.key === "ArrowUp") {
+            if (event.key === "ArrowUp" && !checkCheckboxByIndex(2)) {
                 if (current_index < globalData[gif_index].positions.length - 1) {
                     current_index++; // Increase the variable when the up arrow key is pressed
                 } else {
@@ -122,7 +192,7 @@
                 console.log("Increased: " + current_index);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 drawBackground();
-            } else if (event.key === "ArrowDown") {
+            } else if (event.key === "ArrowDown" && !checkCheckboxByIndex(2)) {
                 if (current_index > 0) {
                     current_index--; // Increase the variable when the up arrow key is pressed
                 } else {
@@ -193,16 +263,15 @@
                 ctx.fillStyle = "rgba(23, 122, 6, 0.61)"; // rgba(255, 165, 0, 1)
                 ctx.fill();
                 ctx.closePath();
-                ctx.font = '15px Arial';
-                ctx.fillStyle = 'black';
-                ctx.fillText("Drone " + i, x - radiusWidth / 4, y - 20);
 
-                // for (let j = 1; j <= current_index; j++) {
-                //     drawDottedLine((globalData[gif_index].positions[j - 1][i][1]) * scale, globalData[gif_index].positions[j - 1][i][0] * scale,
-                //         (globalData[gif_index].positions[j][i][1]) * scale, globalData[gif_index].positions[j][i][0] * scale, i);
-                // }
-                drawDottedLine(x, y, globalData[gif_index].positions[current_index][optimals[i]][1] * scale,
-                    globalData[gif_index].positions[current_index][optimals[i]][0] * scale, i);
+                if (checkCheckboxByIndex(1)) {
+                    ctx.font = '15px Arial';
+                    ctx.fillStyle = 'black';
+                    ctx.fillText("Drone " + i, x - radiusWidth / 4, y - 20);
+
+                    drawDottedLine(x, y, globalData[gif_index].positions[current_index][optimals[i]][1] * scale,
+                        globalData[gif_index].positions[current_index][optimals[i]][0] * scale, i);
+                }
                 ctx.font = '20px Arial';
                 ctx.fillStyle = 'black';
 
@@ -235,17 +304,63 @@
         }
 
         function animate() {
-            drawDrones();
-            for (let i = 0; i < n; i++) {
-                moveDroneTowardsTarget(i);
+            if (checkCheckboxByIndex(0)) {
+                drawDrones();
+                for (let i = 0; i < n; i++) {
+                    moveDroneTowardsTarget(i);
+                }
             }
-
             // Request next animation frame
             requestAnimationFrame(animate);
         }
 
         // Event listener for keydown events
         window.addEventListener("keydown", handleKeyDown);
+
+        // Function to check the checkbox at a specific index
+        function checkCheckboxByIndex(index) {
+            const checkboxes = document.querySelectorAll('.fancy-checkbox');
+
+            if (index >= 0 && index < checkboxes.length) {
+                return checkboxes[index].checked;
+            }
+        }
+
+        // Function to handle new inputs
+        function handleNewInput(event) {
+            // You can perform any action here when a new input occurs
+            console.log(`New input detected from checkbox ${event.target.id}`);
+            drawBackground();
+        }
+
+        // Attach event listener to each checkbox
+        const checkboxes = document.querySelectorAll('.fancy-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', handleNewInput);
+        });
+
+        // Function to simulate pressing the right arrow key
+        function pressRightArrowKey() {
+            const event = new KeyboardEvent('keydown', {
+                key: 'ArrowRight',
+                keyCode: 39,
+                which: 39,
+                code: 'ArrowRight',
+                keyIdentifier: 'Right'
+            });
+
+            // Dispatch the event
+            window.dispatchEvent(event);
+        }
+        // Function to be called every second
+        function nextSlide() {
+            if (checkCheckboxByIndex(5)) {
+                pressRightArrowKey();
+            }
+        }
+
+        // Call the function every second (1000 milliseconds)
+        setInterval(nextSlide, 1000);
     </script>
 </body>
 

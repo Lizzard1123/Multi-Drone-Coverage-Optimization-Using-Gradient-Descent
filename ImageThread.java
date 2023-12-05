@@ -45,5 +45,7 @@ public class ImageThread extends Thread{
         output = gd.start(iterations, numDrones, stepSize);
         
         manager.remove(id, output);
+
+        this.interrupt();
     }
 }

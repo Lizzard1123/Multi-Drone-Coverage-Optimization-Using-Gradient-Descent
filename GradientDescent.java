@@ -174,7 +174,7 @@ public class GradientDescent {
     }
 
     public GDGifOutput startThreads(int threads, int frames, int iterations, int numDrones, double stepSize){
-        ThreadHandler threadHandler = new ThreadHandler(threads);
+        ThreadHandler threadHandler = new ThreadHandler(threads, frames);
         GDOutput[] outputs = threadHandler.start(iterations, numDrones, stepSize, frames, image);
         return new GDGifOutput(outputs);
     }
