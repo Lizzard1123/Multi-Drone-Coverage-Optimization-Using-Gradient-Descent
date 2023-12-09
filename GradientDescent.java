@@ -96,7 +96,7 @@ public class GradientDescent {
                 double onlyOneCoverage = image.coverage(onlyOneDrone);
                 individualHistory[i][k] = onlyOneCoverage;
             }
-            if(i % (iterations / popNumber) == 0){
+            if(i != 0 && i % (iterations / popNumber) == 0){
                 int highestIndex = 0;
                 double highestCoverage = individualHistory[i][highestIndex];
                 int lowestIndex = 0;

@@ -9,7 +9,8 @@ public class Main {
         int numDrones = 15;
         int radius = 10;
         int frames = 256;
-        String name = "./frames/frame_000_delay-0.04s.jpg";
+        //String name = "./frames/frame_000_delay-0.04s.jpg";
+        String name = "./BPmap2.jpeg";
         Coords.setRadius(radius);
         Pixels image = new Pixels(width, name);
         image.listInfo();
@@ -85,8 +86,8 @@ public class Main {
         int iterations = 100;
         int processes = 16;
         //GDOutput output = gd.start(iterations, numDrones, stepSize);
-        // GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize);
-        GDGifOutput output = gd.startThreads(processes, frames, iterations, numDrones, stepSize);
+        GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize, true);
+        //GDGifOutput output = gd.startThreads(processes, frames, iterations, numDrones, stepSize);
         output.createFile(stepSize, numDrones, Coords.radius, width, image.getSize());
 
     }

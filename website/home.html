@@ -8,10 +8,16 @@
         body,
         html {
             height: 100%;
-            margin: 0;
+            margin: 20px;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            /* justify-content: center; */
+            /* align-items: center; */
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+        
+        body {
+            overflow: hidden;
         }
         
         #canvas-container {
@@ -20,6 +26,7 @@
         
         canvas {
             border: 1px solid #000;
+            display: block;
         }
         
         #container {
@@ -58,6 +65,12 @@
         label {
             font-family: Arial, sans-serif;
         }
+        
+        #canvas2-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
     <script src="output.js"></script>
     <script src="hungarian.js"></script>
@@ -89,11 +102,24 @@
             <input type="checkbox" class="fancy-checkbox" id="checkbox5">
             <label for="checkbox5">Animate</label>
         </div>
+        <div class="input-container">
+            <input type="checkbox" class="fancy-checkbox" id="checkbox6">
+            <label for="checkbox6">Draw Underlining</label>
+        </div>
     </div>
 
     <div id="canvas-container">
         <canvas id="myCanvas"></canvas>
         <img src="BPmap.jpeg" id="background-image" style="display: none;">
+        <img src="map.jpeg" id="map" style="display: none;">
+    </div>
+    <div id="canvas2-container"></div>
+    <div>
+        <canvas id="frame" width="400" height="300"></canvas>
+    </div>
+    <div>
+        <canvas id="overall" width="800" height="300"></canvas>
+    </div>
     </div>
     <script>
         var gif_index = 0;
@@ -106,6 +132,13 @@
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
 
+        const gdCanvas = document.getElementById('frame');
+        const gdctx = gdCanvas.getContext('2d');
+
+        const totalCanvas = document.getElementById('overall');
+        const totalctx = totalCanvas.getContext('2d');
+
+
         const backgroundImage = document.getElementById('background-image');
         backgroundImage.src = globalData[gif_index].imageName; // Replace with your image path
         // Wait for the image to load before setting canvas size
@@ -113,12 +146,18 @@
 
         var current_index = globalData[gif_index].coverage.length - 1;
         var runOnce = false;
+        const totalResults = [];
 
         function drawBackground() {
             backgroundImage.src = globalData[gif_index].imageName;
             canvas.width = backgroundImage.width;
             canvas.height = backgroundImage.height;
-            ctx.drawImage(backgroundImage, 0, 0);
+            if (!checkCheckboxByIndex(6)) {
+                ctx.drawImage(backgroundImage, 0, 0);
+            } else {
+                ctx.drawImage(document.getElementById("map"), 0, 0);
+            }
+
 
             if (checkCheckboxByIndex(3)) {
                 drawCircles(current_index);
@@ -137,7 +176,16 @@
                 runOnce = true;
                 // Start the animation
                 animate();
+
+                //update total line charts
+                for (let i = 0; i < globalData.length; i++) {
+                    totalResults.push(globalData[i].coverage[globalData[gif_index].coverage.length - 1]);
+                }
             }
+
+            //update line charts
+            drawLinePlot(totalCanvas, totalctx, totalResults, gif_index);
+            drawLinePlot(gdCanvas, gdctx, globalData[gif_index].coverage, current_index);
         };
 
         function drawDottedLine(startX, startY, endX, endY, colorcurrent_index) {
@@ -369,6 +417,72 @@
 
         // Call the function every second (1000 milliseconds)
         setInterval(nextSlide, 1000);
+
+        // Function to draw the line plot
+        function drawLinePlot(frameCanvas, framectx, data, index) {
+            const plotWidth = frameCanvas.width - 60; // Width of the plot area
+            const plotHeight = frameCanvas.height - 60; // Height of the plot area
+            const dataLength = data.length;
+            const stepX = plotWidth / (dataLength - 1);
+            const maxData = Math.max(...data);
+            const minData = Math.min(...data);
+
+            framectx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+
+            // Draw the title
+            framectx.font = '16px Arial';
+            framectx.fillStyle = 'black';
+            framectx.textAlign = 'center';
+            framectx.fillText('Gradient Descent Performance', frameCanvas.width / 2, 20);
+
+            // Draw the y-axis scale
+            framectx.textAlign = 'right';
+            framectx.fillText(Math.round(maxData), 40, 15);
+            framectx.fillText(Math.round(minData), 40, frameCanvas.height - 15);
+            framectx.beginPath();
+            framectx.moveTo(40, 30);
+            framectx.lineTo(40, frameCanvas.height - 30);
+            framectx.strokeStyle = 'black';
+            framectx.stroke();
+
+            // Draw the x and y axis
+            framectx.beginPath();
+            framectx.moveTo(40, 20);
+            framectx.lineTo(40, plotHeight + 20);
+            framectx.lineTo(plotWidth + 40, plotHeight + 20);
+            framectx.strokeStyle = 'black';
+            framectx.stroke();
+
+            // Plot the data points
+            framectx.beginPath();
+            framectx.strokeStyle = 'blue';
+            framectx.lineWidth = 2;
+
+            for (let i = 0; i < dataLength; i++) {
+                const x = i * stepX + 40;
+                const y = plotHeight - ((data[i] - minData) / (maxData - minData)) * plotHeight + 20;
+
+                if (i === 0) {
+                    framectx.moveTo(x, y);
+                } else {
+                    framectx.lineTo(x, y);
+                }
+                framectx.arc(x, y, 3, 0, Math.PI * 2);
+            }
+
+            framectx.stroke();
+
+            // Draw a vertical red line at the specified index
+            if (index >= 0 && index < dataLength) {
+                const lineX = index * stepX + 40;
+
+                framectx.beginPath();
+                framectx.strokeStyle = 'red';
+                framectx.moveTo(lineX, 20);
+                framectx.lineTo(lineX, frameCanvas.height - 40);
+                framectx.stroke();
+            }
+        }
     </script>
 </body>
 

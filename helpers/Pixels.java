@@ -14,7 +14,7 @@ public class Pixels
   private double totalValue;
   public int width;
   private String name;
-  private double noiseWeight = 0.5;
+  private double noiseWeight = .75;
 
   public Pixels(int width, String name)
   {
