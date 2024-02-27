@@ -97,6 +97,13 @@ radius
 stepSize
 iterations
 
+In GradientDescent.java
+popNumber
+popBar
+
+In Pixels.java
+noiseWeight
+
 Play around with the buttons in the webpage to see all the data
 left and right arrowkeys on the keyboard iterate through frames of the gif
 up and down arrowkeys on the keyboard iterate through the Gradient Descent process

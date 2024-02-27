@@ -116,12 +116,14 @@ public class Main {
          */
 
         // single threaded approach
-        // has to be used in order to warm start GD from the results of the previous frame
-        GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize, true);
+        // has to be used in order to warm start GD from the results of the previous frame, takes around 8 min
+        // change the last parameter here to false to disable warm starting each frame (will be random every start)
+        //GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize, true);
 
         // multithreaded approach
         // fast, no warm start, higher variance in results between frames, less likely to get stuck in local minimum and thus higher average
-        //GDGifOutput output = gd.startThreads(processes, frames, iterations, numDrones, stepSize);
+        // live updates in the terminal
+        GDGifOutput output = gd.startThreads(processes, frames, iterations, numDrones, stepSize);
 
         // creates the output.js file in the website directory, which is the JSON data dump
         output.createFile(stepSize, numDrones, Coords.radius, width, image.getSize());
