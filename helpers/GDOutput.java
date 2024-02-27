@@ -3,10 +3,15 @@ package helpers;
 import java.io.FileWriter;
 import java.io.IOException;
 
+// Holds all the data of the Gradient Descent process
 public class GDOutput {
+    // 2D array, first dimension is time, second is the n number of drones
     public Coords[][] coords;
+    // history of the performance of GD
     public double[] coverageOverTime;
+    // individual performance of each drone measured on its own
     public double[][] individualHistory;
+    // name of the file
     public String name;
 
     public GDOutput(Coords[][] coords, double[] coverageOverTime, double[][] individualHistory, String name){
@@ -28,6 +33,7 @@ public class GDOutput {
         return this.coverageOverTime;
     }
 
+    // prints to the terminal the results of gradient descent
     public void printChanges(){
         System.out.println("[");
         for(int i = 0; i < coverageOverTime.length; i++){
@@ -40,6 +46,7 @@ public class GDOutput {
         System.out.print("]");
     }
 
+    // print to the terminal the history of the GD input (all drone locations)(not 100% sure i remember this correctly)
     public void printHistory(){
         System.out.println("------- HISTORY -------");
         System.out.println("[");
@@ -63,6 +70,7 @@ public class GDOutput {
         System.out.print("]");
     }
 
+    // print to the terminal the history of each drone (not 100% sure i remember this correctly)
     public void printIndividualHistory(){
         System.out.println("------- INDIVIDUAL HISTORY -------");
         System.out.println("[");
@@ -86,6 +94,8 @@ public class GDOutput {
         System.out.print("]");
     }
 
+    //data dumps the results into a JSON file
+    //DEPRECATED in favor of GDGifOutput.java (use as a 1 long gif)
     public void createFile(double stepSize, int numDrones, int radius, int width, int imageSize, String name){
         // JSON string construction
         StringBuilder jsonBuilder = new StringBuilder();

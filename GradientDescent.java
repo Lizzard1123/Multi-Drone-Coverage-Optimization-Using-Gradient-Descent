@@ -6,19 +6,30 @@ import helpers.GDOutput;
 import helpers.Pixels;
 import helpers.PreciseCoords;
 
+// you know this algorithm better than I do lol
 public class GradientDescent {
+    //weighted (burn) probability matrix
     public Pixels image;
+    // HEURISTIC: # of times throughout the gradient descent steps that the lowest performing drone teleports to the highest performing one
     private int popNumber = 5;
+    // HEURISTIC: If the lowest performer is <= 70% of Highest performer, move it
     private double popBar = 0.70;
 
     public GradientDescent(Pixels image){
         this.image = image;
     }
 
+    // Hold on to your seat for this one
+    // Calculates the gradient matrix (of same size 2*n) by taking the derivative of moving (separately) the X and Y of each drone (separately)
+    // This "gradient" is then used to move ALL of the drones at the same time.
+    // It is obsoletely not the best way, there are cases where drones both move towards each other which makes the overall performance drop
+    // because the output of the coverage function is team based, this individual approach is terrible, I know lol
     public PreciseCoords[] getAllGradients(Coords[] locations){
         PreciseCoords[] derivatives = new PreciseCoords[locations.length];
+        // how far to move from origin to take derivative
         int step = 1;
         for(int i = 0; i < derivatives.length; i++){
+            // use Precise cords to hold in the same shape as the original coords, the derivatives with Double precision 
             PreciseCoords coordPartials = new PreciseCoords(0, 0);
             //change in i.x
             locations[i].setX(locations[i].getX() - step);
@@ -44,6 +55,7 @@ public class GradientDescent {
         return derivatives;
     }
 
+    //Debug, print the gradient matrix
     public void printDerivatives(PreciseCoords[] derivs){
         System.out.println("[");
         for(int i = 0; i < derivs.length; i++){
@@ -56,20 +68,26 @@ public class GradientDescent {
         System.out.print("]");
     }
 
+
+    //Gradient Descent algorithm
     public GDOutput start(int iterations, int numDrones, double stepSize, Coords[] prev){
-        //start in random locations
+        //history of the entire process
         Coords[][] history = new Coords[iterations][numDrones];
+        // performance history of each drone
         double[][] individualHistory = new double[iterations][numDrones];
+        // final optimal locations
         Coords[] locations;
         if(prev == null){
             locations = image.randomPositions(numDrones);
         } else {
             locations = image.warmStart(prev);
         }
+        // track the result of GD over iterations
         double[] coverageOverTime = new double[iterations];
         for(int i = 0; i < iterations; i++){
+            // End iteration cleanup
             if(i == iterations - 1){
-                //pick best performer and put it at the end
+                //HEURISTIC pick best performer and put it at the end
                 int bestIndex = 0;
                 double bestCoverage = coverageOverTime[bestIndex];
                 for(int j = 1; j < coverageOverTime.length - 1; j++){
@@ -91,11 +109,18 @@ public class GradientDescent {
                 coverageOverTime[i] = bestCoverage;
                 continue;
             }
+
+            //Start process for the iteration
+
+            //update individual drone performance tracker
             for(int k = 0; k < locations.length; k++){
                 Coords[] onlyOneDrone = {locations[k]};
                 double onlyOneCoverage = image.coverage(onlyOneDrone);
                 individualHistory[i][k] = onlyOneCoverage;
             }
+
+            // In the case that it has reached one of the benchmark checkpoints, execute the teleport heuristic
+            // move lowest performer to the highest performer if it falls below a certain bar
             if(i != 0 && i % (iterations / popNumber) == 0){
                 int highestIndex = 0;
                 double highestCoverage = individualHistory[i][highestIndex];
@@ -118,17 +143,21 @@ public class GradientDescent {
                     locations[lowestIndex].setY(newY);
                 }
             }
+
             //get Gradient matrix of coords
             PreciseCoords[] gradient = getAllGradients(locations);
-            //update locations
+
+            //update locations with a diminishing step size
+            // much thanks to a one Hunter Kuperman for helping me with this decay function
             double diminishingStep = (Math.exp(-((double) i) / 30) * 3 + 1) * stepSize;
+            //
             for(int j = 0; j < numDrones; j++){
                 int newX = (int) Math.round(locations[j].getX() + (diminishingStep * gradient[j].getX()));
                 locations[j].setX(newX);
                 int newY = (int) Math.round(locations[j].getY() + (diminishingStep * gradient[j].getY()));
                 locations[j].setY(newY);
             }
-            // check new positions
+            // metric new positions
             coverageOverTime[i] = image.coverage(locations);
             //copy into history
             for(int k = 0; k < locations.length; k++){
@@ -138,15 +167,16 @@ public class GradientDescent {
         return new GDOutput(history, coverageOverTime, individualHistory, image.getName());
     }
 
+    //java's version of an override that makes for a simple way of overloading a function
     public GDOutput start(int iterations, int numDrones, double stepSize){
         return start(iterations, numDrones, stepSize, null);
     }
 
-
+    // Same process as above, just multiple times over again.
     public GDGifOutput start(int frames, int iterations, int numDrones, double stepSize, boolean warm){
         GDOutput[] outputs = new GDOutput[frames];
         for(int i = 0; i < frames; i++){
-            //make new image
+            //make new image filename (formatting again)
             String newIndex = "";
             int num = i;
             if(num < 100){
@@ -159,7 +189,7 @@ public class GradientDescent {
             String newString = "./frames/frame_" + newIndex + "_delay-0.04s.jpg";
             Pixels newImage = new Pixels(image.width, newString);
             this.image = newImage;
-
+            // check to see if this is configured for warm starting
             if(i == 0 || !warm){
                 outputs[i] = start(iterations, numDrones, stepSize);
             } else {
@@ -169,10 +199,12 @@ public class GradientDescent {
         return new GDGifOutput(outputs);
     }
 
+    //java's version of an override that makes for a simple way of overloading a function
     public GDGifOutput start(int frames, int iterations, int numDrones, double stepSize){
         return start(frames, iterations, numDrones, stepSize, false);
     }
 
+    //same ordeal, now with multithreading enabled :)
     public GDGifOutput startThreads(int threads, int frames, int iterations, int numDrones, double stepSize){
         ThreadHandler threadHandler = new ThreadHandler(threads, frames);
         GDOutput[] outputs = threadHandler.start(iterations, numDrones, stepSize, frames, image);

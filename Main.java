@@ -5,15 +5,29 @@ import helpers.Pixels;
 
 public class Main {
     public static void main(String[] args){
+        // desired width (in pixels) of the probability matrix (can be the full size of the input image, or less)
+        // the smaller this matrix is, the faster the computations
         int width = 100;
+        // the number of drones to run in the simulation
         int numDrones = 15;
+        // the coverage radius (search radius) of a drone (relative to the size of the probability matrix)
         int radius = 10;
+        // how long the gif is in # of frames, each frame will run with Gradient Descent
         int frames = 256;
-        //String name = "./frames/frame_000_delay-0.04s.jpg";
+        // file path of the desired burn probability matrix (will be shrunk down by width variable)
         String name = "./BPmap2.jpeg";
         Coords.setRadius(radius);
         Pixels image = new Pixels(width, name);
         image.listInfo();
+
+
+        /*
+         *
+         * OLD scripts built up while testing
+         * wont remove in the case that one of them is useful
+         * not guaranteed to work
+         *
+         */
 
         //image.printImage(image.getGrid(20));
         //image.printImage();
@@ -81,13 +95,35 @@ public class Main {
         // GradientDescent gd = new GradientDescent(image);
         // gd.printDerivatives(gd.getAllGradients(randomLocations));
 
-        GradientDescent gd = new GradientDescent(image);
-        double stepSize = 5;
-        int iterations = 100;
-        int processes = 16;
         //GDOutput output = gd.start(iterations, numDrones, stepSize);
+
+        /*
+         *
+         * Start of code
+         *
+         */
+
+        GradientDescent gd = new GradientDescent(image);
+        // step size of the Gradient Descent
+        double stepSize = 5;
+        // # of iterations of Gradient Descent, I tried using a convergence threshold, but it would prematurely end before the heuristics kicked in
+        int iterations = 100;
+        // used in the case of multithreading
+        int processes = 16;
+
+        /*
+         * Start commands
+         */
+
+        // single threaded approach
+        // has to be used in order to warm start GD from the results of the previous frame
         GDGifOutput output = gd.start(frames, iterations, numDrones, stepSize, true);
+
+        // multithreaded approach
+        // fast, no warm start, higher variance in results between frames, less likely to get stuck in local minimum and thus higher average
         //GDGifOutput output = gd.startThreads(processes, frames, iterations, numDrones, stepSize);
+
+        // creates the output.js file in the website directory, which is the JSON data dump
         output.createFile(stepSize, numDrones, Coords.radius, width, image.getSize());
 
     }

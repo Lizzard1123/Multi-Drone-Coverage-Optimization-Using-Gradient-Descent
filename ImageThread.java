@@ -4,6 +4,7 @@ import helpers.Coords;
 import helpers.GDOutput;
 import helpers.Pixels;
 
+// Thread that does gradient descent on one frame of the GIF
 public class ImageThread extends Thread{
     private int id;
     private GradientDescent gd;
@@ -26,8 +27,10 @@ public class ImageThread extends Thread{
         return this;
     }
 
+    //creates a new thread that runs gradient descent on a frame (split by the gif)
     @Override
     public void run(){
+        //string formatting workaround
         String newIndex = "";
         int num = id;
         if(num < 100){
@@ -38,12 +41,13 @@ public class ImageThread extends Thread{
         }
         newIndex += num;
         String newString = "./frames/frame_" + newIndex + "_delay-0.04s.jpg";
+        // prep infrastructure
         Pixels newImage = new Pixels(oldImage.width, newString);
+        // execute GD
         gd = new GradientDescent(newImage);
-
         GDOutput output;
         output = gd.start(iterations, numDrones, stepSize);
-        
+        // callback to the manager to remove this thread and log the output produced
         manager.remove(id, output);
 
         this.interrupt();

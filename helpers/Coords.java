@@ -1,7 +1,7 @@
 package helpers;
 
+//representation of coordinates
 public class Coords {
-    //in
     private int x;
     private int y;
     public static int radius = 0;

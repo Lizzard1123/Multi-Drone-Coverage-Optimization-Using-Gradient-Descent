@@ -1,7 +1,7 @@
 package helpers;
 
+//Double datatype representation of Coords.java
 public class PreciseCoords {
-    //in
     private double x;
     private double y;
     public double radius = 3;

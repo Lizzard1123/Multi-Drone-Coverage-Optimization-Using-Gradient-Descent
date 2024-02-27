@@ -7,8 +7,8 @@ import helpers.Coords;
 import helpers.GDOutput;
 import helpers.Pixels;
 
+//manages java's threads
 public class ThreadHandler {
-
     private int processLimits;
     private int completed;
     private volatile int next;
@@ -22,6 +22,7 @@ public class ThreadHandler {
         outputs = new GDOutput[frames];
     }
 
+    //create up to the limit # of threads to process gif
     public GDOutput[] start(int iterations, int numDrones, double stepSize, int frameCount, Pixels image){
         while(completed < frameCount){
             if(currentRunnning < processLimits){
@@ -39,6 +40,7 @@ public class ThreadHandler {
 
     }
 
+    //remove thread and log output
     public synchronized void remove(int id, GDOutput optimal){
         outputs[id] = optimal;
         completed++;

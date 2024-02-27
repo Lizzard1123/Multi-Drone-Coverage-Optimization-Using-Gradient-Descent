@@ -3,6 +3,8 @@ package helpers;
 import java.io.FileWriter;
 import java.io.IOException;
 
+// Pretty much data dumps the result of the Java computations into a JSON file that can be read by JS in the website
+//creates a JSON representation of multiple GDOutputs
 public class GDGifOutput {
     private GDOutput[] outputs;
 
