@@ -72,9 +72,9 @@ git required
    - git clone https://github.com/Lizzard1123/Drone_Coverage_GD
    - cd Drone_Coverage_GD
 3. Compile the project
-   - javac *.java
+   - javac *.java (run in ${PROJ_HOME}/Drone_Coverage_GD)
 4. Run the program
-   - java Main.java
+   - java Main.java (run in ${PROJ_HOME}/Drone_Coverage_GD)
 5. The program will populate output.js in the website directory
 6. Open the home.html file (double click on it in the file system)
 7. enjoy
