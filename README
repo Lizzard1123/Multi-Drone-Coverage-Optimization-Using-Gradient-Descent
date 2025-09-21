@@ -1,3 +1,62 @@
+# Multi-Drone Coverage Optimization Using Gradient Descent
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-21.0.1-orange.svg)](https://www.java.com)
+[![Status](https://img.shields.io/badge/status-archived-yellow.svg)]()
+
+## Overview
+
+An advanced gradient descent algorithm implementation for optimizing autonomous drone fleet coverage over dynamic probability maps. This system simulates multiple drones working collaboratively to maximize coverage of high-priority areas, with real-time visualization and interactive controls.
+
+**Key Features:**
+- Multi-threaded gradient descent optimization
+- Hungarian algorithm for optimal drone-target assignment
+- Interactive web-based visualization
+- Teleportation heuristic for escaping local minima
+- Applications in wildfire monitoring, search & rescue, and surveillance
+
+---
+
+## Project Presentation
+
+<details>
+<summary><b>View Full Presentation</b></summary>
+
+<div align="center">
+
+<img src="Slide1.png" alt="Title Slide" width="800" />
+
+---
+
+<img src="Slide2.png" alt="Slide 2" width="800" />
+
+---
+
+<img src="Slide3.png" alt="Slide 3" width="800" />
+
+---
+
+<img src="Slide4.png" alt="Slide 4" width="800" />
+
+---
+
+### Slide 5: Coverage Optimization Demo
+https://github.com/user-attachments/assets/93c54488-56eb-4e05-8b33-5e58c1ec4c52
+
+---
+
+### Slide 6: Algorithm Visualization
+https://github.com/user-attachments/assets/6bd5148a-4d29-4a4d-bd93-954db8895643
+---
+
+<img src="Slide7.png" alt="Slide 7" width="800" />
+
+</div>
+
+</details>
+
+---
+
 ##############
 File Structure and Description
 ##############
