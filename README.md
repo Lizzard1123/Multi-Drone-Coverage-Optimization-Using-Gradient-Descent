@@ -19,9 +19,6 @@ An advanced gradient descent algorithm implementation for optimizing autonomous 
 
 ## Project Presentation
 
-<details>
-<summary><b>View Full Presentation</b></summary>
-
 <div align="center">
 
 <img src="Slide1.png" alt="Title Slide" width="800" />
@@ -53,10 +50,8 @@ https://github.com/user-attachments/assets/6bd5148a-4d29-4a4d-bd93-954db8895643
 
 </div>
 
-</details>
 
----
-
+```
 ##############
 File Structure and Description
 ##############
@@ -171,3 +166,4 @@ The teleport heuristic sometimes works, sometimes doesn't, sometimes it needs 2,
 It was my way of getting around local minimums with my horrible gradient function
 
 Speaking of that, you can clearly see when going through the steps how there are drones that move to the same position and then away from it because the gradient has no idea about teamwork and the nature of the coverage function is team based, not individual like i'm measuring it by
+```
