@@ -37,13 +37,12 @@ An advanced gradient descent algorithm implementation for optimizing autonomous 
 
 ---
 
-### Slide 5: Coverage Optimization Demo
 https://github.com/user-attachments/assets/93c54488-56eb-4e05-8b33-5e58c1ec4c52
 
 ---
 
-### Slide 6: Algorithm Visualization
 https://github.com/user-attachments/assets/6bd5148a-4d29-4a4d-bd93-954db8895643
+
 ---
 
 <img src="Slide7.png" alt="Slide 7" width="800" />
